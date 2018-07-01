@@ -281,10 +281,44 @@ func TestHash_Consistent(t *testing.T) {
 							a0[i0], i0, numRemove, step)
 					}
 				}
-				fmt.Printf("step: %-4d numRemove: %-6d len: %-6d total: %-12d\n", step, numRemove, h1.Len(), total)
+				fmt.Printf("step: %-4d numRemove: %-6d len: %-6d total: %-12d [ok]\n",
+					step, numRemove, h1.Len(), total)
 			} else {
 				m0 = m1
 			}
 		}
 	}
+}
+
+func Example() {
+	h := NewHash()
+	for i := 0; i < 10; i++ {
+		h.Add(fmt.Sprintf("node%d", i))
+	}
+
+	fmt.Println(h.Len())
+	fmt.Println(h.LooseLen())
+
+	fmt.Println(h.Get(1000))
+	fmt.Println(h.Get(2000))
+	fmt.Println(h.Get(3000))
+
+	h.Remove("node3")
+	fmt.Println(h.Len())
+	fmt.Println(h.LooseLen())
+
+	fmt.Println(h.Get(1000))
+	fmt.Println(h.Get(2000))
+	fmt.Println(h.Get(3000))
+
+	// Output: 10
+	// 10
+	// node9
+	// node2
+	// node3
+	// 9
+	// 10
+	// node9
+	// node2
+	// node0
 }
