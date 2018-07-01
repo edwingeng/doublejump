@@ -311,7 +311,8 @@ func Example() {
 	fmt.Println(h.Get(2000))
 	fmt.Println(h.Get(3000))
 
-	// Output: 10
+	// Output:
+	// 10
 	// 10
 	// node9
 	// node2
