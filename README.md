@@ -1,2 +1,2 @@
 # doublejump
-An evolved Google's jump consistent hash
+A variation of the Google's jump consistent hash
