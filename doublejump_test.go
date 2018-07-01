@@ -108,11 +108,88 @@ func TestHash_Basic(t *testing.T) {
 
 	h1.Shrink()
 	always(h1, t)
+	h1.Shrink()
+	always(h1, t)
 
 	for i := 0; i < 100*n1; i += 100 {
 		h1.Remove(i)
 		always(h1, t)
 	}
+}
+
+func TestHash_Add(t *testing.T) {
+	h := NewHashWithoutLock()
+	h.Add(100)
+	h.Add(200)
+	h.Add(300)
+	h.Add(100)
+	always(h, t)
+
+	if h.Len() != 3 {
+		t.Fatalf("h.Len() != 3")
+	}
+
+	h.Remove(200)
+	if h.Len() != 2 {
+		t.Fatalf("h.Len() != 2")
+	}
+
+	h.Add(500)
+	always(h, t)
+	if len(h.loose.a) != 3 || h.loose.a[0].(int) != 100 || h.loose.a[1].(int) != 500 || h.loose.a[2].(int) != 300 {
+		t.Fatalf("h.loose.a is wrong. a: %v", h.loose.a)
+	}
+}
+
+func TestHash_Get(t *testing.T) {
+	h := NewHashWithoutLock()
+	if h.Get(100) != nil {
+		t.Fatal("Get should return nil when the hash has no node at all")
+	}
+
+	for i := 0; i < 10; i++ {
+		h.Add(i)
+	}
+	for i := 9; i >= 0; i-- {
+		h.Remove(i)
+	}
+	if h.Get(100) != nil {
+		t.Fatal("something is wrong with Get")
+	}
+}
+
+func TestHash_LooseLen(t *testing.T) {
+	h := NewHashWithoutLock()
+	for i := 0; i < 10; i++ {
+		h.Add(i)
+	}
+	if h.LooseLen() != 10 {
+		t.Fatal("h.LooseLen() != 10")
+	}
+
+	n := 10
+	for i := 1; i < 10; i += 2 {
+		h.Remove(i)
+		n--
+		if h.Len() != n {
+			t.Fatalf("h.Len() != n. h.Len(): %d, n: %d", h.Len(), n)
+		}
+		if h.LooseLen() != 10 {
+			t.Fatal("h.LooseLen() should not change after calling Remove")
+		}
+	}
+}
+
+func TestHash_Nil(t *testing.T) {
+	var h *Hash
+	h.Add(nil)
+	h.Add(100)
+	h.Remove(nil)
+	h.Remove(100)
+	h.Len()
+	h.LooseLen()
+	h.Get(0)
+	h.Shrink()
 }
 
 func balance(total uint64, h *Hash, t *testing.T) float64 {
