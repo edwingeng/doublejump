@@ -10,6 +10,22 @@ import (
 	"stathat.com/c/consistent"
 )
 
+func BenchmarkDoubleJumpWithoutLock(b *testing.B) {
+	for i := 10; i <= 1000; i *= 10 {
+		b.Run(fmt.Sprintf("%d-nodes", i), func(b *testing.B) {
+			h := doublejump.NewHashWithoutLock()
+			for j := 0; j < i; j++ {
+				h.Add(fmt.Sprintf("node%d", j))
+			}
+
+			b.ResetTimer()
+			for j := 0; j < b.N; j++ {
+				h.Get(uint64(j))
+			}
+		})
+	}
+}
+
 func BenchmarkDoubleJump(b *testing.B) {
 	for i := 10; i <= 1000; i *= 10 {
 		b.Run(fmt.Sprintf("%d-nodes", i), func(b *testing.B) {

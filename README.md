@@ -3,17 +3,21 @@ This is a variation of the Google's jump consistent hash. It overcomes the short
 
 # Benchmark
 ```
-BenchmarkDoubleJump/10-nodes            20000000            73.3 ns/op
-BenchmarkDoubleJump/100-nodes           20000000            85.9 ns/op
-BenchmarkDoubleJump/1000-nodes          20000000            97.5 ns/op
+BenchmarkDoubleJumpWithoutLock/10-nodes             50000000            27.6 ns/op
+BenchmarkDoubleJumpWithoutLock/100-nodes            30000000            42.7 ns/op
+BenchmarkDoubleJumpWithoutLock/1000-nodes           30000000            54.1 ns/op
 
-BenchmarkStathatConsistent/10-nodes      5000000           293 ns/op
-BenchmarkStathatConsistent/100-nodes     5000000           327 ns/op
-BenchmarkStathatConsistent/1000-nodes    3000000           435 ns/op
+BenchmarkDoubleJump/10-nodes                        20000000            72.9 ns/op
+BenchmarkDoubleJump/100-nodes                       20000000            86.1 ns/op
+BenchmarkDoubleJump/1000-nodes                      20000000            97.9 ns/op
 
-BenchmarkSerialxHashring/10-nodes        5000000           283 ns/op
-BenchmarkSerialxHashring/100-nodes       5000000           341 ns/op
-BenchmarkSerialxHashring/1000-nodes      3000000           426 ns/op
+BenchmarkStathatConsistent/10-nodes                  5000000           301 ns/op
+BenchmarkStathatConsistent/100-nodes                 5000000           334 ns/op
+BenchmarkStathatConsistent/1000-nodes                3000000           444 ns/op
+
+BenchmarkSerialxHashring/10-nodes                    5000000           280 ns/op
+BenchmarkSerialxHashring/100-nodes                   5000000           340 ns/op
+BenchmarkSerialxHashring/1000-nodes                  3000000           427 ns/op
 ```
 
 # Example
