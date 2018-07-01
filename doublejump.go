@@ -108,9 +108,17 @@ type Hash struct {
 	mu      sync.RWMutex
 	loose   looseHolder
 	compact compactHolder
+	lock    bool
 }
 
 func NewHash() *Hash {
+	hash := &Hash{lock: true}
+	hash.loose.m = make(map[interface{}]int)
+	hash.compact.m = make(map[interface{}]int)
+	return hash
+}
+
+func NewHashWithoutLock() *Hash {
 	hash := &Hash{}
 	hash.loose.m = make(map[interface{}]int)
 	hash.compact.m = make(map[interface{}]int)
@@ -122,8 +130,10 @@ func (this *Hash) Add(obj interface{}) {
 		return
 	}
 
-	this.mu.Lock()
-	defer this.mu.Unlock()
+	if this.lock {
+		this.mu.Lock()
+		defer this.mu.Unlock()
+	}
 
 	this.loose.add(obj)
 	this.compact.add(obj)
@@ -134,8 +144,10 @@ func (this *Hash) Remove(obj interface{}) {
 		return
 	}
 
-	this.mu.Lock()
-	defer this.mu.Unlock()
+	if this.lock {
+		this.mu.Lock()
+		defer this.mu.Unlock()
+	}
 
 	this.loose.remove(obj)
 	this.compact.remove(obj)
@@ -146,10 +158,14 @@ func (this *Hash) Len() int {
 		return 0
 	}
 
-	this.mu.RLock()
-	n := len(this.compact.a)
-	this.mu.RUnlock()
-	return n
+	if this.lock {
+		this.mu.RLock()
+		n := len(this.compact.a)
+		this.mu.RUnlock()
+		return n
+	}
+
+	return len(this.compact.a)
 }
 
 func (this *Hash) LooseLen() int {
@@ -157,10 +173,14 @@ func (this *Hash) LooseLen() int {
 		return 0
 	}
 
-	this.mu.RLock()
-	n := len(this.loose.a)
-	this.mu.RUnlock()
-	return n
+	if this.lock {
+		this.mu.RLock()
+		n := len(this.loose.a)
+		this.mu.RUnlock()
+		return n
+	}
+
+	return len(this.loose.a)
 }
 
 func (this *Hash) Shrink() {
@@ -168,8 +188,10 @@ func (this *Hash) Shrink() {
 		return
 	}
 
-	this.mu.Lock()
-	defer this.mu.Unlock()
+	if this.lock {
+		this.mu.Lock()
+		defer this.mu.Unlock()
+	}
 
 	this.loose.shrink()
 	this.compact.shrink(this.loose.a)
@@ -180,8 +202,10 @@ func (this *Hash) Get(key uint64) interface{} {
 		return nil
 	}
 
-	this.mu.RLock()
-	defer this.mu.RUnlock()
+	if this.lock {
+		this.mu.RLock()
+		defer this.mu.RUnlock()
+	}
 
 	obj := this.loose.get(key)
 	if obj != nil {
