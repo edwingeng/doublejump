@@ -122,7 +122,7 @@ func NewHash() *Hash {
 	return hash
 }
 
-// NewHash creates a new doublejump hash instance, which does NOT threadsafe.
+// NewHashWithoutLock creates a new doublejump hash instance, which does NOT threadsafe.
 func NewHashWithoutLock() *Hash {
 	hash := &Hash{}
 	hash.loose.m = make(map[interface{}]int)
