@@ -13,54 +13,54 @@ type looseHolder struct {
 	f []int
 }
 
-func (this *looseHolder) add(obj interface{}) {
-	if _, ok := this.m[obj]; ok {
+func (xh *looseHolder) add(obj interface{}) {
+	if _, ok := xh.m[obj]; ok {
 		return
 	}
 
-	if nf := len(this.f); nf == 0 {
-		this.a = append(this.a, obj)
-		this.m[obj] = len(this.a) - 1
+	if nf := len(xh.f); nf == 0 {
+		xh.a = append(xh.a, obj)
+		xh.m[obj] = len(xh.a) - 1
 	} else {
-		idx := this.f[nf-1]
-		this.f = this.f[:nf-1]
-		this.a[idx] = obj
-		this.m[obj] = idx
+		idx := xh.f[nf-1]
+		xh.f = xh.f[:nf-1]
+		xh.a[idx] = obj
+		xh.m[obj] = idx
 	}
 }
 
-func (this *looseHolder) remove(obj interface{}) {
-	if idx, ok := this.m[obj]; ok {
-		this.f = append(this.f, idx)
-		this.a[idx] = nil
-		delete(this.m, obj)
+func (xh *looseHolder) remove(obj interface{}) {
+	if idx, ok := xh.m[obj]; ok {
+		xh.f = append(xh.f, idx)
+		xh.a[idx] = nil
+		delete(xh.m, obj)
 	}
 }
 
-func (this *looseHolder) get(key uint64) interface{} {
-	na := len(this.a)
+func (xh *looseHolder) get(key uint64) interface{} {
+	na := len(xh.a)
 	if na == 0 {
 		return nil
 	}
 
 	h := jump.Hash(key, na)
-	return this.a[h]
+	return xh.a[h]
 }
 
-func (this *looseHolder) shrink() {
-	if len(this.f) == 0 {
+func (xh *looseHolder) shrink() {
+	if len(xh.f) == 0 {
 		return
 	}
 
 	var a []interface{}
-	for _, obj := range this.a {
+	for _, obj := range xh.a {
 		if obj != nil {
 			a = append(a, obj)
-			this.m[obj] = len(a) - 1
+			xh.m[obj] = len(a) - 1
 		}
 	}
-	this.a = a
-	this.f = nil
+	xh.a = a
+	xh.f = nil
 }
 
 type compactHolder struct {
@@ -68,41 +68,41 @@ type compactHolder struct {
 	m map[interface{}]int
 }
 
-func (this *compactHolder) add(obj interface{}) {
-	if _, ok := this.m[obj]; ok {
+func (xh *compactHolder) add(obj interface{}) {
+	if _, ok := xh.m[obj]; ok {
 		return
 	}
 
-	this.a = append(this.a, obj)
-	this.m[obj] = len(this.a) - 1
+	xh.a = append(xh.a, obj)
+	xh.m[obj] = len(xh.a) - 1
 }
 
-func (this *compactHolder) shrink(a []interface{}) {
+func (xh *compactHolder) shrink(a []interface{}) {
 	for i, obj := range a {
-		this.a[i] = obj
-		this.m[obj] = i
+		xh.a[i] = obj
+		xh.m[obj] = i
 	}
 }
 
-func (this *compactHolder) remove(obj interface{}) {
-	if idx, ok := this.m[obj]; ok {
-		n := len(this.a)
-		this.a[idx] = this.a[n-1]
-		this.m[this.a[idx]] = idx
-		this.a[n-1] = nil
-		this.a = this.a[:n-1]
-		delete(this.m, obj)
+func (xh *compactHolder) remove(obj interface{}) {
+	if idx, ok := xh.m[obj]; ok {
+		n := len(xh.a)
+		xh.a[idx] = xh.a[n-1]
+		xh.m[xh.a[idx]] = idx
+		xh.a[n-1] = nil
+		xh.a = xh.a[:n-1]
+		delete(xh.m, obj)
 	}
 }
 
-func (this *compactHolder) get(key uint64, nl int) interface{} {
-	na := len(this.a)
+func (xh *compactHolder) get(key uint64, nl int) interface{} {
+	na := len(xh.a)
 	if na == 0 {
 		return nil
 	}
 
 	h := jump.Hash(uint64(float64(key)/float64(nl)*float64(na)), na)
-	return this.a[h]
+	return xh.a[h]
 }
 
 // Hash is a revamped Google's jump consistent hash. It overcomes the shortcoming of the
@@ -131,97 +131,97 @@ func NewHashWithoutLock() *Hash {
 }
 
 // Add adds an object to the hash.
-func (this *Hash) Add(obj interface{}) {
-	if this == nil || obj == nil {
+func (xh *Hash) Add(obj interface{}) {
+	if xh == nil || obj == nil {
 		return
 	}
 
-	if this.lock {
-		this.mu.Lock()
-		defer this.mu.Unlock()
+	if xh.lock {
+		xh.mu.Lock()
+		defer xh.mu.Unlock()
 	}
 
-	this.loose.add(obj)
-	this.compact.add(obj)
+	xh.loose.add(obj)
+	xh.compact.add(obj)
 }
 
 // Remove removes an object from the hash.
-func (this *Hash) Remove(obj interface{}) {
-	if this == nil || obj == nil {
+func (xh *Hash) Remove(obj interface{}) {
+	if xh == nil || obj == nil {
 		return
 	}
 
-	if this.lock {
-		this.mu.Lock()
-		defer this.mu.Unlock()
+	if xh.lock {
+		xh.mu.Lock()
+		defer xh.mu.Unlock()
 	}
 
-	this.loose.remove(obj)
-	this.compact.remove(obj)
+	xh.loose.remove(obj)
+	xh.compact.remove(obj)
 }
 
 // Len returns the number of objects in the hash.
-func (this *Hash) Len() int {
-	if this == nil {
+func (xh *Hash) Len() int {
+	if xh == nil {
 		return 0
 	}
 
-	if this.lock {
-		this.mu.RLock()
-		n := len(this.compact.a)
-		this.mu.RUnlock()
+	if xh.lock {
+		xh.mu.RLock()
+		n := len(xh.compact.a)
+		xh.mu.RUnlock()
 		return n
 	}
 
-	return len(this.compact.a)
+	return len(xh.compact.a)
 }
 
 // LooseLen returns the size of the inner loose object holder.
-func (this *Hash) LooseLen() int {
-	if this == nil {
+func (xh *Hash) LooseLen() int {
+	if xh == nil {
 		return 0
 	}
 
-	if this.lock {
-		this.mu.RLock()
-		n := len(this.loose.a)
-		this.mu.RUnlock()
+	if xh.lock {
+		xh.mu.RLock()
+		n := len(xh.loose.a)
+		xh.mu.RUnlock()
 		return n
 	}
 
-	return len(this.loose.a)
+	return len(xh.loose.a)
 }
 
 // Shrink removes all empty slots from the hash.
-func (this *Hash) Shrink() {
-	if this == nil {
+func (xh *Hash) Shrink() {
+	if xh == nil {
 		return
 	}
 
-	if this.lock {
-		this.mu.Lock()
-		defer this.mu.Unlock()
+	if xh.lock {
+		xh.mu.Lock()
+		defer xh.mu.Unlock()
 	}
 
-	this.loose.shrink()
-	this.compact.shrink(this.loose.a)
+	xh.loose.shrink()
+	xh.compact.shrink(xh.loose.a)
 }
 
 // Get returns an object according to the key provided.
-func (this *Hash) Get(key uint64) interface{} {
-	if this == nil {
+func (xh *Hash) Get(key uint64) interface{} {
+	if xh == nil {
 		return nil
 	}
 
-	if this.lock {
-		this.mu.RLock()
-		defer this.mu.RUnlock()
+	if xh.lock {
+		xh.mu.RLock()
+		defer xh.mu.RUnlock()
 	}
 
-	obj := this.loose.get(key)
+	obj := xh.loose.get(key)
 	if obj != nil {
 		return obj
 	}
 
-	return this.compact.get(key, len(this.loose.a))
+	return xh.compact.get(key, len(xh.loose.a))
 }
