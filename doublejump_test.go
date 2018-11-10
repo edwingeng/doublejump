@@ -1,6 +1,7 @@
 package doublejump
 
 import (
+	"flag"
 	"fmt"
 	"math"
 	"math/rand"
@@ -9,6 +10,8 @@ import (
 	"testing"
 	"testing/quick"
 )
+
+var debugMode = flag.Bool("debug", false, "enable the debug mode")
 
 func always(h *Hash, t *testing.T) {
 	if len(h.loose.a) != len(h.loose.m)+len(h.loose.f) {
@@ -290,9 +293,11 @@ func TestHash_Balance(t *testing.T) {
 				}
 			}
 
-			total := uint64(h1.Len()) * 10000
-			fmt.Printf("numRemove: %-6d len: %-6d total: %-12d maxErr: %.2f\n",
-				numRemove, h1.Len(), total, balance(total, h1, t))
+			if *debugMode {
+				total := uint64(h1.Len()) * 10000
+				fmt.Printf("numRemove: %-6d len: %-6d total: %-12d maxErr: %.2f\n",
+					numRemove, h1.Len(), total, balance(total, h1, t))
+			}
 		}(numRemove)
 	}
 
@@ -358,8 +363,10 @@ func TestHash_Consistent(t *testing.T) {
 							a0[i0], i0, numRemove, step)
 					}
 				}
-				fmt.Printf("step: %-4d numRemove: %-6d len: %-6d total: %-12d [ok]\n",
-					step, numRemove, h1.Len(), total)
+				if *debugMode {
+					fmt.Printf("step: %-4d numRemove: %-6d len: %-6d total: %-12d [ok]\n",
+						step, numRemove, h1.Len(), total)
+				}
 			} else {
 				m0 = m1
 			}
