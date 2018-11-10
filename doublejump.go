@@ -1,3 +1,4 @@
+// Package doublejump provides a revamped Google's jump consistent hash.
 package doublejump
 
 import (
@@ -104,6 +105,8 @@ func (this *compactHolder) get(key uint64, nl int) interface{} {
 	return this.a[h]
 }
 
+// Hash is a revamped Google's jump consistent hash. It overcomes the shortcoming of the
+// original implementation - not being able to remove nodes.
 type Hash struct {
 	mu      sync.RWMutex
 	loose   looseHolder
@@ -111,6 +114,7 @@ type Hash struct {
 	lock    bool
 }
 
+// NewHash creates a new doublejump hash instance, which is threadsafe.
 func NewHash() *Hash {
 	hash := &Hash{lock: true}
 	hash.loose.m = make(map[interface{}]int)
@@ -118,6 +122,7 @@ func NewHash() *Hash {
 	return hash
 }
 
+// NewHash creates a new doublejump hash instance, which does NOT threadsafe.
 func NewHashWithoutLock() *Hash {
 	hash := &Hash{}
 	hash.loose.m = make(map[interface{}]int)
@@ -125,6 +130,7 @@ func NewHashWithoutLock() *Hash {
 	return hash
 }
 
+// Add adds an object to the hash.
 func (this *Hash) Add(obj interface{}) {
 	if this == nil || obj == nil {
 		return
@@ -139,6 +145,7 @@ func (this *Hash) Add(obj interface{}) {
 	this.compact.add(obj)
 }
 
+// Remove removes an object from the hash.
 func (this *Hash) Remove(obj interface{}) {
 	if this == nil || obj == nil {
 		return
@@ -153,6 +160,7 @@ func (this *Hash) Remove(obj interface{}) {
 	this.compact.remove(obj)
 }
 
+// Len returns the number of objects in the hash.
 func (this *Hash) Len() int {
 	if this == nil {
 		return 0
@@ -168,6 +176,7 @@ func (this *Hash) Len() int {
 	return len(this.compact.a)
 }
 
+// LooseLen returns the size of the inner loose object holder.
 func (this *Hash) LooseLen() int {
 	if this == nil {
 		return 0
@@ -183,6 +192,7 @@ func (this *Hash) LooseLen() int {
 	return len(this.loose.a)
 }
 
+// Shrink removes all empty slots from the hash.
 func (this *Hash) Shrink() {
 	if this == nil {
 		return
@@ -197,6 +207,7 @@ func (this *Hash) Shrink() {
 	this.compact.shrink(this.loose.a)
 }
 
+// Get returns an object according to the key provided.
 func (this *Hash) Get(key uint64) interface{} {
 	if this == nil {
 		return nil

@@ -1,5 +1,5 @@
 # Overview
-This is a variation of the Google's jump consistent hash. It overcomes the shortcoming of not being able to remove nodes of the original implementation at the price of not being so consistent under some circumstances.
+This is a revamped Google's jump consistent hash. It overcomes the shortcoming of the original implementation - not being able to remove nodes.
 
 # Benchmark
 ```
