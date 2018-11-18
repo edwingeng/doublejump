@@ -56,4 +56,4 @@ fmt.Println(h.Get(3000))
 ```
 
 # Acknowledgements
-The original implementation of the algorithm is credited to [dgryski](github.com/dgryski/go-jump).
+The implementation of the original algorithm is credited to [dgryski](github.com/dgryski/go-jump).
