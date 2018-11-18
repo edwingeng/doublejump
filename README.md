@@ -54,3 +54,6 @@ fmt.Println(h.Get(3000))
 // node2
 // node0
 ```
+
+# Acknowledgements
+The original implementation of the algorithm is credited to [dgryski](github.com/dgryski/go-jump).
