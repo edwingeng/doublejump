@@ -101,7 +101,7 @@ func (this *compactHolder) get(key uint64, nl int) interface{} {
 		return nil
 	}
 
-	h := jump.Hash(uint64(float64(key)/float64(nl)*float64(na)), na)
+	h := jump.Hash(key*0xc6a4a7935bd1e995, na)
 	return this.a[h]
 }
 
