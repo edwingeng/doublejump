@@ -1,5 +1,5 @@
 # Overview
-This is a revamped Google's jump consistent hash. It overcomes the shortcoming of the original implementation - not being able to remove nodes.
+This is a revamped [Google's jump](https://arxiv.org/pdf/1406.2294.pdf) consistent hash. It overcomes the shortcoming of the original implementation - not being able to remove nodes.
 
 # Benchmark
 ```
