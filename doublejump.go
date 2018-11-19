@@ -95,7 +95,7 @@ func (this *compactHolder) remove(obj interface{}) {
 	}
 }
 
-func (this *compactHolder) get(key uint64, nl int) interface{} {
+func (this *compactHolder) get(key uint64) interface{} {
 	na := len(this.a)
 	if na == 0 {
 		return nil
@@ -223,5 +223,5 @@ func (this *Hash) Get(key uint64) interface{} {
 		return obj
 	}
 
-	return this.compact.get(key, len(this.loose.a))
+	return this.compact.get(key)
 }
