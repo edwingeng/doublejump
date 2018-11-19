@@ -213,15 +213,22 @@ func (this *Hash) Get(key uint64) interface{} {
 		return nil
 	}
 
+	var obj interface{}
 	if this.lock {
 		this.mu.RLock()
-		defer this.mu.RUnlock()
+		obj = this.loose.get(key)
+		switch obj {
+		case nil:
+			obj = this.compact.get(key)
+		}
+		this.mu.RUnlock()
+	} else {
+		obj = this.loose.get(key)
+		switch obj {
+		case nil:
+			obj = this.compact.get(key)
+		}
 	}
 
-	obj := this.loose.get(key)
-	if obj != nil {
-		return obj
-	}
-
-	return this.compact.get(key)
+	return obj
 }
