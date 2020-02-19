@@ -188,18 +188,6 @@ func TestHash_LooseLen(t *testing.T) {
 	}
 }
 
-func TestHash_Nil(t *testing.T) {
-	var h *Hash
-	h.Add(nil)
-	h.Add(100)
-	h.Remove(nil)
-	h.Remove(100)
-	h.Len()
-	h.LooseLen()
-	h.Get(0)
-	h.Shrink()
-}
-
 func balance(total uint64, h *Hash, t *testing.T) float64 {
 	if h.Len() == 0 {
 		return 0

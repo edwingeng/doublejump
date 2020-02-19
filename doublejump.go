@@ -124,7 +124,7 @@ func NewHash() *Hash {
 
 // Add adds an object to the hash.
 func (this *Hash) Add(obj interface{}) {
-	if this == nil || obj == nil {
+	if obj == nil {
 		return
 	}
 
@@ -134,7 +134,7 @@ func (this *Hash) Add(obj interface{}) {
 
 // Remove removes an object from the hash.
 func (this *Hash) Remove(obj interface{}) {
-	if this == nil || obj == nil {
+	if obj == nil {
 		return
 	}
 
@@ -144,38 +144,22 @@ func (this *Hash) Remove(obj interface{}) {
 
 // Len returns the number of objects in the hash.
 func (this *Hash) Len() int {
-	if this == nil {
-		return 0
-	}
-
 	return len(this.compact.a)
 }
 
 // LooseLen returns the size of the inner loose object holder.
 func (this *Hash) LooseLen() int {
-	if this == nil {
-		return 0
-	}
-
 	return len(this.loose.a)
 }
 
 // Shrink removes all empty slots from the hash.
 func (this *Hash) Shrink() {
-	if this == nil {
-		return
-	}
-
 	this.loose.shrink()
 	this.compact.shrink(this.loose.a)
 }
 
 // Get returns an object according to the key provided.
 func (this *Hash) Get(key uint64) interface{} {
-	if this == nil {
-		return nil
-	}
-
 	obj := this.loose.get(key)
 	switch obj {
 	case nil:
@@ -187,10 +171,6 @@ func (this *Hash) Get(key uint64) interface{} {
 
 // All returns all the objects in this Hash.
 func (this *Hash) All() []interface{} {
-	if this == nil {
-		return nil
-	}
-
 	all := make([]interface{}, len(this.compact.a))
 	copy(all, this.compact.a)
 	return all
@@ -198,14 +178,9 @@ func (this *Hash) All() []interface{} {
 
 // Random returns a random object.
 func (this *Hash) Random() interface{} {
-	if this == nil {
-		return nil
-	}
-
 	if n := len(this.compact.a); n > 0 {
 		idx := rand.Intn(n)
 		return this.compact.a[idx]
 	}
-
 	return nil
 }
