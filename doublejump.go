@@ -2,6 +2,7 @@
 package doublejump
 
 import (
+	"math/rand"
 	"sync"
 
 	"github.com/dgryski/go-jump"
@@ -184,7 +185,7 @@ func (this *Hash) Get(key uint64) interface{} {
 	}
 }
 
-// All returns all the objects in this Hash
+// All returns all the objects in this Hash.
 func (this *Hash) All() []interface{} {
 	if this == nil {
 		return nil
@@ -193,4 +194,18 @@ func (this *Hash) All() []interface{} {
 	all := make([]interface{}, len(this.compact.a))
 	copy(all, this.compact.a)
 	return all
+}
+
+// Random returns a random object.
+func (this *Hash) Random() interface{} {
+	if this == nil {
+		return nil
+	}
+
+	if n := len(this.compact.a); n > 0 {
+		idx := rand.Intn(n)
+		return this.compact.a[idx]
+	}
+
+	return nil
 }
