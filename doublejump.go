@@ -171,7 +171,11 @@ func (this *Hash) Get(key uint64) interface{} {
 
 // All returns all the objects in this Hash.
 func (this *Hash) All() []interface{} {
-	all := make([]interface{}, len(this.compact.a))
+	n := len(this.compact.a)
+	if n == 0 {
+		return nil
+	}
+	all := make([]interface{}, n)
 	copy(all, this.compact.a)
 	return all
 }
