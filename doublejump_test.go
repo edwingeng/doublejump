@@ -66,6 +66,11 @@ func always(h *Hash, t *testing.T) {
 			t.Fatalf("m2[%d] != h.compact.m[%d]. idx: %d, i: %d", obj, obj, idx, i)
 		}
 	}
+
+	all := h.All()
+	if len(all) != h.Len() {
+		t.Fatal("len(all) != h.Len()")
+	}
 }
 
 func TestHash_Basic(t *testing.T) {

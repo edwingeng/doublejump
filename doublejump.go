@@ -232,3 +232,23 @@ func (this *Hash) Get(key uint64) interface{} {
 
 	return obj
 }
+
+// All returns all the objects in this Hash
+func (this *Hash) All() []interface{} {
+	if this == nil {
+		return nil
+	}
+
+	var all []interface{}
+	if this.lock {
+		this.mu.RLock()
+		all = make([]interface{}, len(this.compact.a))
+		copy(all, this.compact.a)
+		this.mu.RUnlock()
+	} else {
+		all = make([]interface{}, len(this.compact.a))
+		copy(all, this.compact.a)
+	}
+
+	return all
+}
