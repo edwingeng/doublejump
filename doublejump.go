@@ -111,19 +111,10 @@ type Hash struct {
 	mu      sync.RWMutex
 	loose   looseHolder
 	compact compactHolder
-	lock    bool
 }
 
-// NewHash creates a new doublejump hash instance, which is threadsafe.
+// NewHash creates a new doublejump hash instance, which does NOT threadsafe.
 func NewHash() *Hash {
-	hash := &Hash{lock: true}
-	hash.loose.m = make(map[interface{}]int)
-	hash.compact.m = make(map[interface{}]int)
-	return hash
-}
-
-// NewHashWithoutLock creates a new doublejump hash instance, which does NOT threadsafe.
-func NewHashWithoutLock() *Hash {
 	hash := &Hash{}
 	hash.loose.m = make(map[interface{}]int)
 	hash.compact.m = make(map[interface{}]int)
@@ -136,11 +127,6 @@ func (this *Hash) Add(obj interface{}) {
 		return
 	}
 
-	if this.lock {
-		this.mu.Lock()
-		defer this.mu.Unlock()
-	}
-
 	this.loose.add(obj)
 	this.compact.add(obj)
 }
@@ -149,11 +135,6 @@ func (this *Hash) Add(obj interface{}) {
 func (this *Hash) Remove(obj interface{}) {
 	if this == nil || obj == nil {
 		return
-	}
-
-	if this.lock {
-		this.mu.Lock()
-		defer this.mu.Unlock()
 	}
 
 	this.loose.remove(obj)
@@ -166,13 +147,6 @@ func (this *Hash) Len() int {
 		return 0
 	}
 
-	if this.lock {
-		this.mu.RLock()
-		n := len(this.compact.a)
-		this.mu.RUnlock()
-		return n
-	}
-
 	return len(this.compact.a)
 }
 
@@ -182,13 +156,6 @@ func (this *Hash) LooseLen() int {
 		return 0
 	}
 
-	if this.lock {
-		this.mu.RLock()
-		n := len(this.loose.a)
-		this.mu.RUnlock()
-		return n
-	}
-
 	return len(this.loose.a)
 }
 
@@ -196,11 +163,6 @@ func (this *Hash) LooseLen() int {
 func (this *Hash) Shrink() {
 	if this == nil {
 		return
-	}
-
-	if this.lock {
-		this.mu.Lock()
-		defer this.mu.Unlock()
 	}
 
 	this.loose.shrink()
@@ -213,24 +175,13 @@ func (this *Hash) Get(key uint64) interface{} {
 		return nil
 	}
 
-	var obj interface{}
-	if this.lock {
-		this.mu.RLock()
-		obj = this.loose.get(key)
-		switch obj {
-		case nil:
-			obj = this.compact.get(key)
-		}
-		this.mu.RUnlock()
-	} else {
-		obj = this.loose.get(key)
-		switch obj {
-		case nil:
-			obj = this.compact.get(key)
-		}
+	obj := this.loose.get(key)
+	switch obj {
+	case nil:
+		return this.compact.get(key)
+	default:
+		return obj
 	}
-
-	return obj
 }
 
 // All returns all the objects in this Hash
@@ -239,16 +190,7 @@ func (this *Hash) All() []interface{} {
 		return nil
 	}
 
-	var all []interface{}
-	if this.lock {
-		this.mu.RLock()
-		all = make([]interface{}, len(this.compact.a))
-		copy(all, this.compact.a)
-		this.mu.RUnlock()
-	} else {
-		all = make([]interface{}, len(this.compact.a))
-		copy(all, this.compact.a)
-	}
-
+	all := make([]interface{}, len(this.compact.a))
+	copy(all, this.compact.a)
 	return all
 }

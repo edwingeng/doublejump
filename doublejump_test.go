@@ -126,7 +126,7 @@ func TestHash_Basic(t *testing.T) {
 }
 
 func TestHash_Add(t *testing.T) {
-	h := NewHashWithoutLock()
+	h := NewHash()
 	h.Add(100)
 	h.Add(200)
 	h.Add(300)
@@ -150,7 +150,7 @@ func TestHash_Add(t *testing.T) {
 }
 
 func TestHash_Get(t *testing.T) {
-	h := NewHashWithoutLock()
+	h := NewHash()
 	if h.Get(100) != nil {
 		t.Fatal("Get should return nil when the hash has no node at all")
 	}
@@ -167,7 +167,7 @@ func TestHash_Get(t *testing.T) {
 }
 
 func TestHash_LooseLen(t *testing.T) {
-	h := NewHashWithoutLock()
+	h := NewHash()
 	for i := 0; i < 10; i++ {
 		h.Add(i)
 	}
