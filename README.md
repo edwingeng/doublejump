@@ -3,17 +3,17 @@ This is a revamped [Google's jump](https://arxiv.org/pdf/1406.2294.pdf) consiste
 
 # Benchmark
 ```
-BenchmarkDoubleJump/10-nodes                     54723506           21.8 ns/op
-BenchmarkDoubleJump/100-nodes                    31263981           38.6 ns/op
-BenchmarkDoubleJump/1000-nodes                   24227624           48.5 ns/op
+BenchmarkDoubleJump/10-nodes                    48824548                22.3 ns/op
+BenchmarkDoubleJump/100-nodes                   33921781                34.9 ns/op
+BenchmarkDoubleJump/1000-nodes                  25635931                46.3 ns/op
 
-BenchmarkStathatConsistent/10-nodes              4053433           292.8 ns/op
-BenchmarkStathatConsistent/100-nodes             3625465           333.8 ns/op
-BenchmarkStathatConsistent/1000-nodes            3148849           389.5 ns/op
+BenchmarkStathatConsistent/10-nodes              4961104               245.6 ns/op
+BenchmarkStathatConsistent/100-nodes             4507544               284.1 ns/op
+BenchmarkStathatConsistent/1000-nodes            3412558               358.2 ns/op
 
-BenchmarkSerialxHashring/10-nodes                2357866           509.8 ns/op
-BenchmarkSerialxHashring/100-nodes               2161783           531.3 ns/op
-BenchmarkSerialxHashring/1000-nodes              1957911           628.4 ns/op
+BenchmarkSerialxHashring/10-nodes                2816680               445.7 ns/op
+BenchmarkSerialxHashring/100-nodes               2535745               482.1 ns/op
+BenchmarkSerialxHashring/1000-nodes              2243271               549.6 ns/op
 ```
 
 # Example
