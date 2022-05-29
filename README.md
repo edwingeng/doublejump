@@ -16,8 +16,18 @@ BenchmarkSerialxHashring/100-nodes               2535745               482.1 ns/
 BenchmarkSerialxHashring/1000-nodes              2243271               549.6 ns/op
 ```
 
-# Example
+# Import
+
+```go
+// If golang version <= 1.17
+import "github.com/edwingeng/doublejump"
+
+// If golang version >= 1.18
+import "github.com/edwingeng/doublejump/v2"
 ```
+
+# Example
+```go
 h := NewHash()
 for i := 0; i < 10; i++ {
     h.Add(fmt.Sprintf("node%d", i))

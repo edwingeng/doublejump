@@ -156,7 +156,7 @@ func (this *Hash) Shrink() {
 	this.compact.shrink(this.loose.a)
 }
 
-// Get returns an object according to the key provided.
+// Get returns an object according to the key provided, or nil if there is no object in the hash.
 func (this *Hash) Get(key uint64) interface{} {
 	obj := this.loose.get(key)
 	switch obj {
