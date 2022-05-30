@@ -3,17 +3,17 @@ Doublejump is a revamped [Google's jump](https://arxiv.org/pdf/1406.2294.pdf) co
 
 # Benchmark
 ```
-BenchmarkDoubleJump/10-nodes                    48824548                22.3 ns/op
-BenchmarkDoubleJump/100-nodes                   33921781                34.9 ns/op
-BenchmarkDoubleJump/1000-nodes                  25635931                46.3 ns/op
+DoubleJump/10-nodes               49276861       22.3 ns/op        0 B/op      0 allocs/op
+DoubleJump/100-nodes              33304191       34.9 ns/op        0 B/op      0 allocs/op
+DoubleJump/1000-nodes             25261296       46.3 ns/op        0 B/op      0 allocs/op
 
-BenchmarkStathatConsistent/10-nodes              4961104               245.6 ns/op
-BenchmarkStathatConsistent/100-nodes             4507544               284.1 ns/op
-BenchmarkStathatConsistent/1000-nodes            3412558               358.2 ns/op
+StathatConsistent/10-nodes         4780832      273.5 ns/op       80 B/op      2 allocs/op
+StathatConsistent/100-nodes        4059537      291.8 ns/op       80 B/op      2 allocs/op
+StathatConsistent/1000-nodes       3132294      367.6 ns/op       80 B/op      2 allocs/op
 
-BenchmarkSerialxHashring/10-nodes                2816680               445.7 ns/op
-BenchmarkSerialxHashring/100-nodes               2535745               482.1 ns/op
-BenchmarkSerialxHashring/1000-nodes              2243271               549.6 ns/op
+SerialxHashring/10-nodes           2766384      455.7 ns/op      152 B/op      5 allocs/op
+SerialxHashring/100-nodes          2500936      487.6 ns/op      152 B/op      5 allocs/op
+SerialxHashring/1000-nodes         2254138      560.0 ns/op      152 B/op      5 allocs/op
 ```
 
 # Examples
