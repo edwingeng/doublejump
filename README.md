@@ -1,5 +1,5 @@
 # Overview
-This is a revamped [Google's jump](https://arxiv.org/pdf/1406.2294.pdf) consistent hash. It overcomes the shortcoming of the original implementation - not being able to remove nodes. Here is [the main idea behind doublejump](https://docs.google.com/presentation/d/e/2PACX-1vTHyFGUJ5CBYxZTzToc_VKxP_Za85AeZqQMNGLXFLP1tX0f9IF_z3ys9-pyKf-Jj3iWpm7dUDDaoFyb/pub?start=false&loop=false&delayms=3000).
+Doublejump is a revamped [Google's jump](https://arxiv.org/pdf/1406.2294.pdf) consistent hash. It overcomes the shortcoming of the original design - being unable to remove nodes. Here is [how it works](https://docs.google.com/presentation/d/e/2PACX-1vTHyFGUJ5CBYxZTzToc_VKxP_Za85AeZqQMNGLXFLP1tX0f9IF_z3ys9-pyKf-Jj3iWpm7dUDDaoFyb/pub?start=false&loop=false&delayms=3000).
 
 # Benchmark
 ```
@@ -16,49 +16,86 @@ BenchmarkSerialxHashring/100-nodes               2535745               482.1 ns/
 BenchmarkSerialxHashring/1000-nodes              2243271               549.6 ns/op
 ```
 
-# Import
+# Examples
 
+### V1
 ```go
 // If golang version <= 1.17
 import "github.com/edwingeng/doublejump"
 
-// If golang version >= 1.18
-import "github.com/edwingeng/doublejump/v2"
+func Example() {
+    h := NewHash()
+    for i := 0; i < 10; i++ {
+        h.Add(fmt.Sprintf("node%d", i))
+    }
+
+    fmt.Println(h.Len())
+    fmt.Println(h.LooseLen())
+
+    fmt.Println(h.Get(1000))
+    fmt.Println(h.Get(2000))
+    fmt.Println(h.Get(3000))
+
+    h.Remove("node3")
+    fmt.Println(h.Len())
+    fmt.Println(h.LooseLen())
+
+    fmt.Println(h.Get(1000))
+    fmt.Println(h.Get(2000))
+    fmt.Println(h.Get(3000))
+
+    // Output:
+    // 10
+    // 10
+    // node9
+    // node2
+    // node3
+    // 9
+    // 10
+    // node9
+    // node2
+    // node0
+}
 ```
 
-# Example
+### V2
 ```go
-h := NewHash()
-for i := 0; i < 10; i++ {
-    h.Add(fmt.Sprintf("node%d", i))
+// If golang version >= 1.18
+import "github.com/edwingeng/doublejump/v2"
+
+func Example() {
+    h := NewHash[string]()
+    for i := 0; i < 10; i++ {
+        h.Add(fmt.Sprintf("node%d", i))
+    }
+
+    fmt.Println(h.Len())
+    fmt.Println(h.LooseLen())
+
+    fmt.Println(h.Get(1000))
+    fmt.Println(h.Get(2000))
+    fmt.Println(h.Get(3000))
+
+    h.Remove("node3")
+    fmt.Println(h.Len())
+    fmt.Println(h.LooseLen())
+
+    fmt.Println(h.Get(1000))
+    fmt.Println(h.Get(2000))
+    fmt.Println(h.Get(3000))
+
+    // Output:
+    // 10
+    // 10
+    // node9 true
+    // node2 true
+    // node3 true
+    // 9
+    // 10
+    // node9 true
+    // node2 true
+    // node0 true
 }
-
-fmt.Println(h.Len())
-fmt.Println(h.LooseLen())
-
-fmt.Println(h.Get(1000))
-fmt.Println(h.Get(2000))
-fmt.Println(h.Get(3000))
-
-h.Remove("node3")
-fmt.Println(h.Len())
-fmt.Println(h.LooseLen())
-
-fmt.Println(h.Get(1000))
-fmt.Println(h.Get(2000))
-fmt.Println(h.Get(3000))
-
-// Output:
-// 10
-// 10
-// node9
-// node2
-// node3
-// 9
-// 10
-// node9
-// node2
-// node0
 ```
 
 # Acknowledgements
