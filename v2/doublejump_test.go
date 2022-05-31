@@ -465,3 +465,19 @@ func TestHash_Consistent(t *testing.T) {
 	default:
 	}
 }
+
+func TestHash_Random(t *testing.T) {
+	h := NewHash[int]()
+	if _, ok := h.Random(); ok {
+		t.Fatal("ok should be false when h is empty")
+	}
+
+	for i := 0; i < 100; i++ {
+		h.Add(i)
+	}
+	for i := 0; i < 10000; i++ {
+		if v, ok := h.Random(); !ok || v < 0 || v >= 100 {
+			t.Fatal("!ok || v < 0 || v >= 100")
+		}
+	}
+}

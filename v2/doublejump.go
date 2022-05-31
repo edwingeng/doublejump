@@ -174,7 +174,8 @@ func (h *Hash[T]) All() []T {
 }
 
 // Random returns a random object.
-func (h *Hash[T]) Random() (T, bool) {
+// If there is no object in the hash, ok is false.
+func (h *Hash[T]) Random() (obj T, ok bool) {
 	n := len(h.compact.a)
 	if n > 0 {
 		return h.compact.a[rand.Intn(n)], true
