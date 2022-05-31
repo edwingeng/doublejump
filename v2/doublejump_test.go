@@ -20,18 +20,26 @@ func init() {
 
 func invariant[T comparable](h *Hash[T], t *testing.T) {
 	t.Helper()
+	err := invariantImpl(h)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func invariantImpl[T comparable](h *Hash[T]) error {
 	if len(h.loose.a) != len(h.loose.m)+len(h.loose.f) {
-		t.Fatalf("len(h.loose.a) != len(h.loose.m) + len(h.loose.f). len(a): %d, len(m): %d, len(f): %d",
+		return fmt.Errorf("len(h.loose.a) != len(h.loose.m) + len(h.loose.f). len(a): %d, len(m): %d, len(f): %d",
 			len(h.loose.a), len(h.loose.m), len(h.loose.f))
 	}
 	if len(h.compact.a) != len(h.compact.m) {
-		t.Fatalf("len(h.compact.a) != len(h.compact.m). len(a): %d, len(m): %d",
+		return fmt.Errorf("len(h.compact.a) != len(h.compact.m). len(a): %d, len(m): %d",
 			len(h.compact.a), len(h.compact.m))
 	}
 
 	for obj, idx := range h.loose.m {
 		if opt := h.loose.a[idx]; !opt.b || opt.v != obj {
-			t.Fatalf(`!opt.b || opt.v != obj. obj: %v, idx: %v, opt.b: %v, opt.v: %v`, obj, idx, opt.b, opt.v)
+			return fmt.Errorf(`!opt.b || opt.v != obj. obj: %v, idx: %v, opt.b: %v, opt.v: %v`,
+				obj, idx, opt.b, opt.v)
 		}
 	}
 
@@ -42,11 +50,11 @@ func invariant[T comparable](h *Hash[T], t *testing.T) {
 		freeMap[idx] = struct{}{}
 		m1[idx] = struct{}{}
 		if h.loose.a[idx].v != defVal {
-			t.Fatalf(`h.loose.a[idx].v != defVal. idx: %d, a[idx]: %v`, idx, h.loose.a[idx])
+			return fmt.Errorf(`h.loose.a[idx].v != defVal. idx: %d, a[idx]: %v`, idx, h.loose.a[idx])
 		}
 	}
 	if len(freeMap) != len(h.loose.f) {
-		t.Fatalf("len(freeMap) != len(h.loose.f). %d vs %d",
+		return fmt.Errorf("len(freeMap) != len(h.loose.f). %d vs %d",
 			len(freeMap), len(h.loose.f))
 	}
 
@@ -57,21 +65,21 @@ func invariant[T comparable](h *Hash[T], t *testing.T) {
 		usedMap[idx] = struct{}{}
 		m1[idx] = struct{}{}
 		if _, ok := freeMap[idx]; ok {
-			t.Fatalf("%d should not be in the free list", idx)
+			return fmt.Errorf("%d should not be in the free list", idx)
 		}
 	}
 	for i := range slots {
 		if h.loose.a[i].b != slots[i] {
-			t.Fatalf("h.loose.a[i].b != slots[i]. i: %d, b[i]: %v, slots[i]: %v",
+			return fmt.Errorf("h.loose.a[i].b != slots[i]. i: %d, b[i]: %v, slots[i]: %v",
 				i, h.loose.a[i].b, slots[i])
 		}
 	}
 	if len(usedMap) != len(h.loose.m) {
-		t.Fatalf("len(usedMap) != len(h.loose.m). %d vs %d",
+		return fmt.Errorf("len(usedMap) != len(h.loose.m). %d vs %d",
 			len(usedMap), len(h.loose.m))
 	}
 	if len(m1) != len(h.loose.a) {
-		t.Fatalf("len(m1) != len(h.loose.a). %d vs %d",
+		return fmt.Errorf("len(m1) != len(h.loose.a). %d vs %d",
 			len(m1), len(h.loose.a))
 	}
 
@@ -80,20 +88,22 @@ func invariant[T comparable](h *Hash[T], t *testing.T) {
 		m2[obj] = i
 	}
 	if len(m2) != len(h.compact.m) {
-		t.Fatalf("len(m2) != len(h.compact.m). len(m2): %d, len(m): %d", len(m2), len(h.compact.m))
+		return fmt.Errorf("len(m2) != len(h.compact.m). len(m2): %d, len(m): %d", len(m2), len(h.compact.m))
 	}
 	for obj, idx := range h.compact.m {
 		if i, ok := m2[obj]; !ok {
-			t.Fatalf("cannot find %v in m2", obj)
+			return fmt.Errorf("cannot find %v in m2", obj)
 		} else if i != idx {
-			t.Fatalf("m2[%v] != h.compact.m[%v]. idx: %d, i: %d", obj, obj, idx, i)
+			return fmt.Errorf("m2[%v] != h.compact.m[%v]. idx: %d, i: %d", obj, obj, idx, i)
 		}
 	}
 
 	all := h.All()
 	if len(all) != h.Len() {
-		t.Fatal("len(all) != h.Len()")
+		return fmt.Errorf("len(all) != h.Len()")
 	}
+
+	return nil
 }
 
 func TestHash_Basic(t *testing.T) {
@@ -280,7 +290,10 @@ func TestHash_Balance(t *testing.T) {
 			})
 			for i := 0; i < rm; i++ {
 				h.Remove(a[i])
-				invariant(h, t)
+				if err := invariantImpl(h); err != nil {
+					chErr <- err
+					return
+				}
 			}
 			if h.Len() != n1-rm {
 				chErr <- fmt.Errorf("h.Len() != n1-rm. h.Len(): %d, n1: %d, rm: %d", h.Len(), n1, rm)
@@ -329,53 +342,126 @@ func TestHash_Balance(t *testing.T) {
 }
 
 func TestHash_Consistent(t *testing.T) {
-	const n1 = 100
-	numbers := []int{0, 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47}
-	var m0 map[int]int
-	for _, rm := range numbers {
-		h1 := NewHash[int]()
-		var xx []int
-		for i := 0; i < n1; i++ {
-			h1.Add(i)
-			xx = append(xx, i)
-		}
-		rand.Shuffle(n1, func(i, j int) {
-			xx[i], xx[j] = xx[j], xx[i]
-		})
-		for i := 0; i < rm; i++ {
-			h1.Remove(xx[i])
-			invariant(h1, t)
-		}
-		if h1.Len() != n1-rm {
-			t.Fatalf("h1.Len() != n1-rm. h1.Len(): %d, n1: %d, rm: %d", h1.Len(), n1, rm)
-		}
-
-		total := n1 * 10000
+	const nn = 100
+	const total = nn * 10000
+	run := func(h *Hash[int]) map[int]int {
 		m1 := make(map[int]int, total)
 		for i := 0; i < total; i++ {
-			if obj, ok := h1.Get(uint64(i)); ok {
+			if obj, ok := h.Get(uint64(i)); ok {
 				m1[i] = obj
 			} else {
 				panic("impossible")
 			}
 		}
+		return m1
+	}
 
-		switch rm {
-		case 0:
-			m0 = m1
-		default:
-			var n2 int
-			for k, v := range m1 {
-				if m0[k] == v {
-					n2++
+	checkResults := func(r1, r2 float64) error {
+		delta := r1 - r2
+		if delta > 0.05 {
+			return fmt.Errorf("delta > 0.05. r1: %.4f, r2: %.4f, delta: %.4f", r1, r2, delta)
+		}
+		return nil
+	}
+
+	h1 := NewHash[int]()
+	for i := 0; i < nn; i++ {
+		h1.Add(i)
+	}
+
+	m0 := run(h1)
+	numbers := []int{2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47}
+	chErr := make(chan error, len(numbers))
+	var wg sync.WaitGroup
+	wg.Add(len(numbers))
+	for _, rm := range numbers {
+		rm := rm
+		go func() {
+			defer wg.Done()
+			h2 := NewHash[int]()
+			var xx []int
+			for i := 0; i < nn; i++ {
+				h2.Add(i)
+				xx = append(xx, i)
+			}
+			rand.Shuffle(nn, func(i, j int) {
+				xx[i], xx[j] = xx[j], xx[i]
+			})
+			for i := 0; i < rm; i++ {
+				h2.Remove(xx[i])
+				if err := invariantImpl(h2); err != nil {
+					chErr <- err
+					return
 				}
 			}
-			r1 := float64(total-n2) / float64(total)
-			r2 := float64(rm) / n1
-			delta := math.Abs(r1 - r2)
-			if delta > 0.05 {
-				t.Fatal("delta > 0.05")
+			if h2.Len() != nn-rm {
+				chErr <- fmt.Errorf("h2.Len() != nn-rm. h2.Len(): %d, nn: %d, rm: %d", h2.Len(), nn, rm)
+				return
 			}
-		}
+
+			m1 := run(h2)
+			var n1 int
+			for k, v := range m1 {
+				if m0[k] == v {
+					n1++
+				}
+			}
+			err := checkResults(float64(total-n1)/total, float64(rm)/nn)
+			if err != nil {
+				chErr <- err
+				return
+			}
+
+			if c2 := rm / 3; c2 > 0 {
+				for i := 0; i < c2; i++ {
+					h2.Add(xx[i])
+					if err := invariantImpl(h2); err != nil {
+						chErr <- err
+						return
+					}
+				}
+				m2 := run(h2)
+				var n2 int
+				for k, v := range m2 {
+					if m1[k] == v {
+						n2++
+					}
+				}
+				err := checkResults(float64(total-n2)/total, float64(c2)/float64(h2.Len()))
+				if err != nil {
+					chErr <- err
+					return
+				}
+
+				if c3 := rm / 7; c3 > 0 {
+					for i := 0; i < c3; i++ {
+						h2.Remove(xx[i])
+						if err := invariantImpl(h2); err != nil {
+							chErr <- err
+							return
+						}
+					}
+					m3 := run(h2)
+					var n3 int
+					for k, v := range m3 {
+						if m2[k] == v {
+							n3++
+						}
+					}
+					err := checkResults(float64(total-n3)/total, float64(c3)/float64(h2.Len()))
+					if err != nil {
+						chErr <- err
+						return
+					}
+				}
+			}
+		}()
+	}
+
+	wg.Wait()
+	select {
+	case err := <-chErr:
+		t.Fatal(err)
+	default:
 	}
 }
