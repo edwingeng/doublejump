@@ -111,14 +111,14 @@ func (holder *compactHolder[T]) get(key uint64) (T, bool) {
 	return holder.a[h], true
 }
 
-// Hash is a revamped Google's jump consistent hash. It overcomes the shortcoming of the
-// original implementation - not being able to remove nodes.
+// Hash is a revamped Google's jump consistent hash. It overcomes the shortcoming of
+// the original implementation - not being able to remove nodes.
 type Hash[T comparable] struct {
 	loose   looseHolder[T]
 	compact compactHolder[T]
 }
 
-// NewHash creates a new doublejump hash instance, which does NOT threadsafe.
+// NewHash creates a new doublejump hash instance, which is NOT thread-safe.
 func NewHash[T comparable]() *Hash[T] {
 	hash := &Hash[T]{}
 	hash.loose.m = make(map[T]int)

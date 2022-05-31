@@ -105,14 +105,14 @@ func (holder *compactHolder) get(key uint64) interface{} {
 	return holder.a[h]
 }
 
-// Hash is a revamped Google's jump consistent hash. It overcomes the shortcoming of the
-// original implementation - not being able to remove nodes.
+// Hash is a revamped Google's jump consistent hash. It overcomes the shortcoming of
+// the original implementation - not being able to remove nodes.
 type Hash struct {
 	loose   looseHolder
 	compact compactHolder
 }
 
-// NewHash creates a new doublejump hash instance, which does NOT threadsafe.
+// NewHash creates a new doublejump hash instance, which is NOT thread-safe.
 func NewHash() *Hash {
 	hash := &Hash{}
 	hash.loose.m = make(map[interface{}]int)
@@ -178,7 +178,7 @@ func (h *Hash) All() []interface{} {
 	return all
 }
 
-// Random returns a random object.
+// Random returns a random object, or nil if there is no object in the hash.
 func (h *Hash) Random() interface{} {
 	if n := len(h.compact.a); n > 0 {
 		idx := rand.Intn(n)
