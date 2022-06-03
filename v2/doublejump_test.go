@@ -26,6 +26,7 @@ func invariant[T comparable](h *Hash[T], t *testing.T) {
 	}
 }
 
+//gocyclo:ignore
 func invariantImpl[T comparable](h *Hash[T]) error {
 	if len(h.loose.a) != len(h.loose.m)+len(h.loose.f) {
 		return fmt.Errorf("len(h.loose.a) != len(h.loose.m) + len(h.loose.f). len(a): %d, len(m): %d, len(f): %d",
@@ -256,6 +257,7 @@ func checkBalance(total int, h *Hash[int]) (float64, error) {
 	return maxErr, nil
 }
 
+//gocyclo:ignore
 func TestHash_Balance(t *testing.T) {
 	sm := make(chan int, runtime.NumCPU()/2+1)
 	for i := 0; i < cap(sm); i++ {
@@ -341,6 +343,7 @@ func TestHash_Balance(t *testing.T) {
 	}
 }
 
+//gocyclo:ignore
 func TestHash_Consistent(t *testing.T) {
 	const nn = 100
 	const total = nn * 10000
