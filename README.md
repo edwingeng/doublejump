@@ -16,6 +16,20 @@ SerialxHashring/100-nodes          2500936      487.6 ns/op      152 B/op      5
 SerialxHashring/1000-nodes         2254138      560.0 ns/op      152 B/op      5 allocs/op
 ```
 
+# Installation
+
+### V1
+```shell
+## If golang version <= 1.17
+go get -u github.com/edwingeng/doublejump
+```
+
+### V2
+```shell
+## If golang version >= 1.18
+go get -u github.com/edwingeng/doublejump/v2
+```
+
 # Examples
 
 ### V1
