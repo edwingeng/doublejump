@@ -112,13 +112,15 @@ func (holder *compactHolder[T]) get(key uint64) (T, bool) {
 }
 
 // Hash is a revamped Google's jump consistent hash. It overcomes the shortcoming of
-// the original implementation - not being able to remove nodes.
+// the original implementation - being unable to remove nodes.
+//
+// Hash is NOT thread-safe.
 type Hash[T comparable] struct {
 	loose   looseHolder[T]
 	compact compactHolder[T]
 }
 
-// NewHash creates a new doublejump hash instance, which is NOT thread-safe.
+// NewHash creates a new doublejump hash instance.
 func NewHash[T comparable]() *Hash[T] {
 	hash := &Hash[T]{}
 	hash.loose.m = make(map[T]int)
@@ -153,8 +155,7 @@ func (h *Hash[T]) Shrink() {
 	h.loose.shrink()
 }
 
-// Get returns an object and a boolean value according to the key provided.
-// If there is no object in the hash, ok is false.
+// Get returns the existing object for the key and reports whether it succeeded.
 func (h *Hash[T]) Get(key uint64) (obj T, ok bool) {
 	if obj, ok = h.loose.get(key); ok {
 		return obj, true
@@ -173,8 +174,7 @@ func (h *Hash[T]) All() []T {
 	return all
 }
 
-// Random returns a random object.
-// If there is no object in the hash, ok is false.
+// Random returns a random object and reports whether it succeeded.
 func (h *Hash[T]) Random() (obj T, ok bool) {
 	n := len(h.compact.a)
 	if n > 0 {
