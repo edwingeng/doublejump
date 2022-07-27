@@ -15,7 +15,7 @@ import (
 var debugMode = flag.Bool("debugMode", false, "enable the debug mode")
 
 func init() {
-	rand.Seed(time.Now().UnixMilli())
+	rand.Seed(time.Now().UnixNano() / 1000)
 }
 
 func invariant(h *Hash, t *testing.T) {
