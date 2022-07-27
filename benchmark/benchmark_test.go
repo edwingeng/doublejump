@@ -13,7 +13,7 @@ var (
 	}
 )
 
-func BenchmarkDoubleJump(b *testing.B) {
+func BenchmarkDoublejump(b *testing.B) {
 	for i := 10; i <= 1000; i *= 10 {
 		b.Run(fmt.Sprintf("%d-nodes", i), func(b *testing.B) {
 			h := doublejump.NewHash()

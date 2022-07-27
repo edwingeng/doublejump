@@ -3,9 +3,9 @@ Doublejump is a revamped [Google's jump](https://arxiv.org/pdf/1406.2294.pdf) co
 
 # Benchmark
 ```
-DoubleJump/10-nodes               49276861       22.3 ns/op        0 B/op      0 allocs/op
-DoubleJump/100-nodes              33304191       34.9 ns/op        0 B/op      0 allocs/op
-DoubleJump/1000-nodes             25261296       46.3 ns/op        0 B/op      0 allocs/op
+Doublejump/10-nodes               49276861       22.3 ns/op        0 B/op      0 allocs/op
+Doublejump/100-nodes              33304191       34.9 ns/op        0 B/op      0 allocs/op
+Doublejump/1000-nodes             25261296       46.3 ns/op        0 B/op      0 allocs/op
 
 StathatConsistent/10-nodes         4780832      273.5 ns/op       80 B/op      2 allocs/op
 StathatConsistent/100-nodes        4059537      291.8 ns/op       80 B/op      2 allocs/op
@@ -16,7 +16,7 @@ SerialxHashring/100-nodes          2500936      487.6 ns/op      152 B/op      5
 SerialxHashring/1000-nodes         2254138      560.0 ns/op      152 B/op      5 allocs/op
 ```
 
-# Installation
+# Getting Started
 
 ### V1
 ```shell
